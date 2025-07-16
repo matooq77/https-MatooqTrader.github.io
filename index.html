@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lot Size Calculator | MATOOQ_TRADER</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    .calculator {
+      background: #1e2a38;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 500px;
+    }
+    .calculator label {
+      display: block;
+      margin: 1rem 0 0.3rem;
+    }
+    .calculator input, .calculator select {
+      width: 100%;
+      padding: 0.6rem;
+      border-radius: 0.5rem;
+      border: none;
+      margin-bottom: 0.5rem;
+    }
+    .calculator button {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      width: 100%;
+      border: none;
+      background: #00b894;
+      color: white;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 1rem;
+      background: #2e3d4f;
+      padding: 1rem;
+      border-radius: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lot Size Calculator - MATOOQ_TRADER</h1>
+  <div class="calculator">
+    <label for="capital">Account Capital ($)</label>
+    <input type="number" id="capital" />
+
+    <label for="risk">Risk Percentage (%)</label>
+    <input type="number" id="risk" />
+
+    <label for="entry">Entry Price</label>
+    <input type="number" id="entry" step="0.00001" />
+
+    <label for="stop">Stop Loss Price</label>
+    <input type="number" id="stop" step="0.00001" />
+
+    <label for="pair">Forex Pair</label>
+    <select id="pair">
+      <option value="standard">Standard (Most USD Pairs)</option>
+      <option value="jpy">JPY Pair (e.g. USDJPY, GBPJPY)</option>
+    </select>
+
+    <button onclick="calculateLot()">Calculate Lot Size</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function calculateLot() {
+      const capital = parseFloat(document.getElementById('capital').value);
+      const riskPercent = parseFloat(document.getElementById('risk').value);
+      const entry = parseFloat(document.getElementById('entry').value);
+      const stop = parseFloat(document.getElementById('stop').value);
+      const pairType = document.getElementById('pair').value;
+
+      if (isNaN(capital) || isNaN(riskPercent) || isNaN(entry) || isNaN(stop)) {
+        document.getElementById('result').innerText = 'Please fill in all fields correctly.';
+        return;
+      }
+
+      const riskAmount = capital * (riskPercent / 100);
+      let pips;
+
+      if (pairType === 'jpy') {
+        pips = Math.abs(entry - stop) * 100;
+      } else {
+        pips = Math.abs(entry - stop) * 10000;
+      }
+
+      if (pips === 0) {
+        document.getElementById('result').innerText = 'Stop loss must not equal entry price.';
+        return;
+      }
+
+      const lotSize = riskAmount / (pips * 10);
+
+      document.getElementById('result').innerHTML = `
+        <strong>Results:</strong><br/>
+        Risk Amount: $${riskAmount.toFixed(2)}<br/>
+        Pips Risked: ${pips.toFixed(1)}<br/>
+        Recommended Lot Size: <strong>${lotSize.toFixed(2)}</strong>
+      `;
+    }
+  </script>
+</body>
+</html>
